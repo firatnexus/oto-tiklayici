@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#1E6FD9</color>
-    <color name="ok">#1E8E3E</color>
-    <color name="bad">#D93025</color>
-    <color name="panel">#E6202124</color>
-    <color name="text2">#5F6368</color>
+    <!-- GitHub tasarım dili: Deep Void zemin, Terminal Green tek aksan -->
+    <color name="primary">#08872B</color>
+    <color name="accent">#2DA44E</color>
+    <color name="ok">#3FB950</color>
+    <color name="bad">#F85149</color>
+    <color name="canvas">#0D1117</color>
+    <color name="surface">#161B22</color>
+    <color name="border">#21262D</color>
+    <color name="text1">#E6EDF3</color>
+    <color name="text2">#A4AEA6</color>
+    <color name="panel">#E6161B22</color>
+    <color name="sky">#8DD6FF</color>
 </resources>

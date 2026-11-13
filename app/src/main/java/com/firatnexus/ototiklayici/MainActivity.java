@@ -18,7 +18,7 @@ public class MainActivity extends Activity {
     private TextView permText, modeDesc;
     private Button permBtn, startBtn;
     private RadioGroup modeGroup;
-    private EditText intervalInput, repeatInput;
+    private EditText intervalInput, jitterInput, targetJitterInput, repeatInput;
     private SharedPreferences prefs;
 
     @Override
@@ -32,6 +32,8 @@ public class MainActivity extends Activity {
         modeGroup = findViewById(R.id.modeGroup);
         modeDesc = findViewById(R.id.modeDesc);
         intervalInput = findViewById(R.id.intervalInput);
+        jitterInput = findViewById(R.id.jitterInput);
+        targetJitterInput = findViewById(R.id.targetJitterInput);
         repeatInput = findViewById(R.id.repeatInput);
         startBtn = findViewById(R.id.startBtn);
 
@@ -40,6 +42,8 @@ public class MainActivity extends Activity {
         updateModeDesc();
         modeGroup.setOnCheckedChangeListener((g, id) -> updateModeDesc());
         intervalInput.setText(String.valueOf(prefs.getLong("interval", 100)));
+        jitterInput.setText(String.valueOf(prefs.getLong("jitter", 0)));
+        targetJitterInput.setText(String.valueOf(prefs.getLong("targetJitter", 0)));
         repeatInput.setText(String.valueOf(prefs.getInt("repeat", 0)));
 
         permBtn.setOnClickListener(v -> openAccessibilitySettings());
@@ -85,12 +89,20 @@ public class MainActivity extends Activity {
         }
         long interval = parseLong(intervalInput.getText().toString(), 100);
         if (interval < 10) interval = 10;
+        long jitter = parseLong(jitterInput.getText().toString(), 0);
+        if (jitter < 0) jitter = 0;
+        if (jitter > interval / 2) jitter = interval / 2; // bekleme süresi negatife düşmesin
+        long targetJitter = parseLong(targetJitterInput.getText().toString(), 0);
+        if (targetJitter < 0) targetJitter = 0;
+        if (targetJitter > 100) targetJitter = 100;
         int repeat = (int) parseLong(repeatInput.getText().toString(), 0);
         if (repeat < 0) repeat = 0;
         boolean multi = modeGroup.getCheckedRadioButtonId() == R.id.modeMulti;
 
-        prefs.edit().putBoolean("multi", multi).putLong("interval", interval).putInt("repeat", repeat).apply();
-        s.showPanel(multi, interval, repeat);
+        prefs.edit().putBoolean("multi", multi).putLong("interval", interval)
+                .putLong("jitter", jitter).putLong("targetJitter", targetJitter)
+                .putInt("repeat", repeat).apply();
+        s.showPanel(multi, interval, jitter, targetJitter, repeat);
         moveTaskToBack(true);
     }
 

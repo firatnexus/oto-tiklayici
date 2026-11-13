@@ -24,11 +24,16 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Yüzen kontrol panelini ve hedef dairelerini gösterir, hedeflere dokunma hareketi gönderir.
  * Erişilebilirlik katmanı (TYPE_ACCESSIBILITY_OVERLAY) kullandığı için ayrıca
  * "diğer uygulamaların üzerinde göster" izni gerekmez.
+ *
+ * v1.1: rastgele bekleme sapması (tespit önleme), hedef sapması (piksel),
+ * panelde canlı tıklama sayacı, sürükleme biter bitmez konum kaydı,
+ * hızlı ayar karo entegrasyonu (QuickTileService).
  */
 public class ClickService extends AccessibilityService {
 
@@ -36,8 +41,10 @@ public class ClickService extends AccessibilityService {
 
     private static final int MAX_TARGETS = 20;
     private static final int TAP_MS = 20;
+    private static final long MIN_DELAY = 10;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Random random = new Random();
     private WindowManager wm;
     private SharedPreferences prefs;
 
@@ -45,11 +52,14 @@ public class ClickService extends AccessibilityService {
     private WindowManager.LayoutParams panelLp;
     private ImageView playBtn;
     private View addBtn, removeBtn;
+    private TextView counter;
     private final List<TextView> targets = new ArrayList<>();
     private final List<WindowManager.LayoutParams> targetLps = new ArrayList<>();
 
     private boolean multi;
     private long interval;
+    private long jitter;        // bekleme sapması ±ms
+    private long targetJitter;  // tıklama noktası sapması ±px
     private int repeat;
 
     private boolean running;
@@ -81,10 +91,14 @@ public class ClickService extends AccessibilityService {
 
     boolean isPanelShown() { return panel != null; }
 
-    void showPanel(boolean multi, long interval, int repeat) {
+    boolean isClicking() { return running; }
+
+    void showPanel(boolean multi, long interval, long jitter, long targetJitter, int repeat) {
         hidePanel();
         this.multi = multi;
         this.interval = interval;
+        this.jitter = jitter;
+        this.targetJitter = targetJitter;
         this.repeat = repeat;
 
         panel = new LinearLayout(this);
@@ -107,6 +121,15 @@ public class ClickService extends AccessibilityService {
         }
         View closeBtn = iconButton(R.drawable.ic_close);
         panel.addView(closeBtn);
+
+        // Canlı tıklama sayacı
+        counter = new TextView(this);
+        counter.setGravity(Gravity.CENTER);
+        counter.setTextColor(Color.WHITE);
+        counter.setTextSize(9);
+        counter.setPadding(0, dp(3), 0, dp(1));
+        counter.setText("0");
+        panel.addView(counter);
 
         // Butonlar hem dokununca çalışır hem de basılı tutup sürükleyince paneli taşır
         draggable(playBtn, panel, panelLp, this::toggleClicking);
@@ -143,9 +166,11 @@ public class ClickService extends AccessibilityService {
         targetLps.clear();
         safeRemove(panel);
         panel = null;
+        counter = null;
     }
 
     private void savePositions() {
+        if (panel == null || panelLp == null) return;
         StringBuilder sb = new StringBuilder();
         for (WindowManager.LayoutParams lp : targetLps) {
             if (sb.length() > 0) sb.append(';');
@@ -216,7 +241,7 @@ public class ClickService extends AccessibilityService {
 
     // ------------------------------------------------------------------ tıklama döngüsü
 
-    private void toggleClicking() {
+    void toggleClicking() {
         if (running) stopClicking(); else startClicking();
     }
 
@@ -251,6 +276,12 @@ public class ClickService extends AccessibilityService {
             float cx = loc[0] + t.getWidth() / 2f;
             float cy = loc[1] + t.getHeight() / 2f;
 
+            // Hedef sapması: tıklama noktası ±targetJitter piksel içinde rastgele
+            if (targetJitter > 0) {
+                cx += random.nextInt((int) targetJitter * 2 + 1) - targetJitter;
+                cy += random.nextInt((int) targetJitter * 2 + 1) - targetJitter;
+            }
+
             Path path = new Path();
             path.moveTo(cx, cy);
             GestureDescription gesture = new GestureDescription.Builder()
@@ -278,7 +309,14 @@ public class ClickService extends AccessibilityService {
                 return;
             }
         }
-        handler.postDelayed(clickStep, Math.max(0, interval - TAP_MS));
+        // Rastgele sapma: bekleme süresi interval ± jitter aralığında
+        long delay = interval;
+        if (jitter > 0) {
+            delay = interval - jitter + random.nextInt((int) jitter * 2 + 1);
+        }
+        if (delay < MIN_DELAY) delay = MIN_DELAY;
+        if (counter != null) counter.setText(String.valueOf(clicks));
+        handler.postDelayed(clickStep, Math.max(0, delay - TAP_MS));
     }
 
     // ------------------------------------------------------------------ yardımcılar
@@ -309,6 +347,7 @@ public class ClickService extends AccessibilityService {
 
     /**
      * Dokunulan view'u sürükleyince {@code window} penceresini taşır; kısa dokunuşta {@code onTap} çalışır.
+     * Sürükleme biter bitmez konum kaydedilir (servis aniden kapansa bile kayıp olmaz).
      */
     @SuppressLint("ClickableViewAccessibility")
     private void draggable(View touch, View window, WindowManager.LayoutParams lp, Runnable onTap) {
@@ -343,7 +382,8 @@ public class ClickService extends AccessibilityService {
                         return true;
                     case MotionEvent.ACTION_UP:
                         v.setPressed(false);
-                        if (!dragging && onTap != null) onTap.run();
+                        if (dragging) savePositions();
+                        else if (onTap != null) onTap.run();
                         return true;
                     case MotionEvent.ACTION_CANCEL:
                         v.setPressed(false);

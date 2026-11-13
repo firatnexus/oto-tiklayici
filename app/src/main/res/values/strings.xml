@@ -11,12 +11,15 @@
     <string name="mode_single_desc">Tek bir noktaya sürekli tıklar.</string>
     <string name="mode_multi_desc">Birden çok noktaya sırayla tıklar (en fazla 20).</string>
     <string name="interval">Tıklama aralığı (ms)</string>
+    <string name="interval_jitter">Rastgele sapma ± (ms, 0 = kapalı)</string>
+    <string name="target_jitter">Hedef sapması ± (piksel, 0 = kapalı)</string>
     <string name="repeat">Tekrar sayısı (0 = durdurana kadar)</string>
     <string name="show_panel">Paneli Göster</string>
     <string name="hide_panel">Paneli Kapat</string>
-    <string name="help">1. İzni aç (yalnızca ilk sefer).\n2. Modu ve hızı seç, Paneli Göster\'e bas.\n3. Hedef dairesini sürükleyip istediğin yere bırak.\n4. Paneldeki ▶ ile başlat, ■ ile durdur.\n\nÇoklu modda + ile hedef ekle, − ile son hedefi sil. Paneli de sürükleyerek taşıyabilirsin.</string>
+    <string name="help">1. İzni aç (yalnızca ilk sefer).\n2. Modu ve hızı seç, Paneli Göster\'e bas.\n3. Hedef dairesini sürükleyip istediğin yere bırak.\n4. Paneldeki ▶ ile başlat, ■ ile durdur.\n\nÇoklu modda + ile hedef ekle, − ile son hedefi sil. Paneli de sürükleyerek taşıyabilirsin.\n\nRastgele sapma, her bekleme süresini belirttiğin oranla rastgele değiştirir; hedef sapması ise tıklama noktasını biraz kaydırır. Her ikisi de 0 iken kapalıdır. Hızlı ayarlar karosundan da başlatıp durdurabilirsin.</string>
     <string name="need_perm">Önce erişilebilirlik iznini aç.</string>
     <string name="perm_hint">Açılan listede \"Oto Tıklayıcı\"yı bul ve etkinleştir.</string>
     <string name="max_targets">En fazla 20 hedef eklenebilir.</string>
     <string name="finished">Tamamlandı: %1$d tıklama</string>
+    <string name="tile_label">Oto Tıklayıcı</string>
 </resources>

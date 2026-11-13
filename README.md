@@ -6,6 +6,7 @@ Hafif ve kullanımı basit bir Android otomatik tıklayıcı. **Tekli** ve **Ço
 - Tek izin: **Erişilebilirlik** (ayrıca "diğer uygulamaların üzerinde göster" izni gerekmez)
 - İnternet izni yok, veri toplamaz, ekran içeriğini okumaz
 - Android 7.0 (API 24) ve üzeri
+- **v1.1.0:** Koyu tema, hızlı ayar karo'su, rastgele aralık/hedef sapması, canlı tıklama sayacı
 
 ## İndir
 
@@ -18,10 +19,15 @@ Hafif ve kullanımı basit bir Android otomatik tıklayıcı. **Tekli** ve **Ço
 2. Modu seç:
    - **Tekli:** Tek bir noktaya sürekli tıklar.
    - **Çoklu:** Birden çok noktaya sırayla tıklar (en fazla 20 hedef).
-3. Tıklama aralığını (ms) ve tekrar sayısını gir (`0` = durdurana kadar).
-4. **Paneli Göster**'e bas. Ekranda yüzen bir panel ve hedef dairesi belirir.
-5. Hedef dairelerini sürükleyip istediğin yere bırak.
-6. Paneldeki **▶** ile başlat, **■** ile durdur.
+3. Tıklama aralığını (ms) gir (`0` = durdurana kadar). İstersen:
+   - **Rastgele Aralık Sapması (±ms):** Her bekleme süresine rastgele sapma ekler; tıklamalar sabit bir desene benzemez.
+   - **Hedef Sapması (±px):** Her tıklama, hedef dairesi içinde rastgele bir noktaya iner.
+4. Tekrar sayısını gir (`0` = durdurana kadar).
+5. **Paneli Göster**'e bas. Ekranda yüzen bir panel ve hedef dairesi belirir.
+6. Hedef dairelerini sürükleyip istediğin yere bırak (bıraktığın anda kaydedilir).
+7. Paneldeki **▶** ile başlat, **■** ile durdur. Sayı gösterge, canlı tıklama sayısını görüntüler.
+
+İpucu: **Hızlı ayarlardaki "Oto Tıklayıcı" karosunu** ekleyerek panele hiç dokunmadan tıklamayı açıp kapatabilirsin.
 
 | Panel butonu | Görevi |
 |---|---|
@@ -29,6 +35,15 @@ Hafif ve kullanımı basit bir Android otomatik tıklayıcı. **Tekli** ve **Ço
 | + | Yeni hedef ekle (Çoklu mod) |
 | − | Son hedefi sil (Çoklu mod) |
 | ✕ | Paneli kapat |
+| 0:123 | Canlı tıklama sayacı (her tıklamada güncellenir) |
+
+## v1.1.0 Yenilikleri
+
+- Hızlı ayarlar (Quick Settings) karo'su: paneldeki butonlara dokunmadan aç/kapa
+- Rastgele aralık sapması (±ms) ve hedef sapması (±px) — sabit desen yerine insansı tıklamalar
+- Yüzen panelde canlı tıklama sayacı
+- Hedef daireleri artık bırakıldığı anda kaydedilir
+- Koyu tema arayüzü
 
 Paneli herhangi bir butonundan basılı tutup sürükleyerek taşıyabilirsin. Hedef ve panel konumları
 bir sonraki açılışta hatırlanır. Çoklu modda tekrar sayısı, tüm hedef listesinin kaç tur döneceğini belirler.
